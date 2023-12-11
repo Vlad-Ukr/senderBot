@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: src/db-migration/db/changes/V1_user_init.yml

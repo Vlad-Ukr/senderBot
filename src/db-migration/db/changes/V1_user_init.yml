@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Vladyslav_Ukrainets
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+                - tableExists:
+                    tableName: users
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: int unsigned
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(254)
+                  constraints:
+                    unique: true
+                    nullable: false
+      rollback:
+        - delete:
+            tableName: users
