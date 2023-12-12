@@ -35,7 +35,7 @@ public class SenderTelegramBot extends TelegramLongPollingBot {
                     execute(commandInvoker.invoke(messageText, update, waitingCommandPool));
                 }
             } catch (Exception exception) {
-                log.info("Unexpected message");
+                log.error(exception.getMessage());
             }
         }
     }

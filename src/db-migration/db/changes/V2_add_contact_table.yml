@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Vladyslav_Ukrainets
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: user_contacts
+      changes:
+        - createTable:
+            tableName: user_contacts
+            columns:
+              - column:
+                  name: user_id
+                  type: int unsigned
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: contact_id
+                  type: int unsigned
+                  autoIncrement: false
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - addForeignKeyConstraint:
+                  baseColumnNames: user_id
+                  baseTableName: user_contacts
+                  constraintName: fk_user_contacts_users
+                  referencedColumnNames: id
+                  referencedTableName: users
+
+              - addForeignKeyConstraint:
+                  baseColumnNames: contact_id
+                  baseTableName: user_contacts
+                  constraintName: fk_user_contacts_users_contacts
+                  referencedColumnNames: id
+                  referencedTableName: users
+      rollback:
+        - delete:
+            tableName: users

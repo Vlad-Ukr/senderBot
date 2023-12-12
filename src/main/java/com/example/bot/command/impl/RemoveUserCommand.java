@@ -15,8 +15,14 @@ public class RemoveUserCommand implements Command {
 
     @Override
     public SendMessage executeCommand(Update update, WaitingCommandPool waitingCommandPool) {
-        userService.removeUser(update.getMessage().getChatId());
+        long chatId = update.getMessage().getChatId();
         SendMessage message = new SendMessage();
+        if (userService.getUser(chatId).isEmpty()) {
+            message.setChatId(chatId);
+            message.setText("You are not registered");
+            return message;
+        }
+        userService.removeUser(chatId);
         message.setChatId(update.getMessage().getChatId());
         message.setText("You have been removed from the bot's database. If you want to use the bot again," +
                 " just enter the /start command\n");

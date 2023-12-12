@@ -19,6 +19,11 @@ public class StartCommand implements Command {
     public SendMessage executeCommand(Update update, WaitingCommandPool waitingCommandPool) {
         long chatId = update.getMessage().getChatId();
         SendMessage message = new SendMessage();
+        if (userService.getUser(chatId).isPresent()) {
+            message.setChatId(chatId);
+            message.setText("You are already registered");
+            return message;
+        }
         if (!waitingCommandPool.isCommandsOnWaiting(chatId)) {
             message.setChatId(chatId);
             message.setText("Hello, Please enter your real First and Last Name. It will be used by other bot users");
