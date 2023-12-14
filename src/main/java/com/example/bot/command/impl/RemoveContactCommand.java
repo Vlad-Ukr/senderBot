@@ -1,5 +1,6 @@
 package com.example.bot.command.impl;
 
+import com.example.bot.bot.Response;
 import com.example.bot.command.Command;
 import com.example.bot.command.CommandKey;
 import com.example.bot.command.WaitingCommandPool;
@@ -17,7 +18,7 @@ public class RemoveContactCommand implements Command {
     }
 
     @Override
-    public SendMessage executeCommand(Update update, WaitingCommandPool waitingCommandPool) {
+    public Response executeCommand(Update update, WaitingCommandPool waitingCommandPool) {
         long chatId = update.getMessage().getChatId();
         SendMessage message = new SendMessage();
         if (!waitingCommandPool.isCommandsOnWaiting(chatId)) {
@@ -36,6 +37,6 @@ public class RemoveContactCommand implements Command {
                 message.setText("User with this id:" + contactId + " not found");
             }
         }
-        return message;
+        return Response.getResponse(message);
     }
 }

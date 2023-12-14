@@ -1,5 +1,6 @@
 package com.example.bot.command.impl;
 
+import com.example.bot.bot.Response;
 import com.example.bot.command.Command;
 import com.example.bot.command.WaitingCommandPool;
 import com.example.bot.service.UserService;
@@ -14,18 +15,18 @@ public class RemoveUserCommand implements Command {
     }
 
     @Override
-    public SendMessage executeCommand(Update update, WaitingCommandPool waitingCommandPool) {
+    public Response executeCommand(Update update, WaitingCommandPool waitingCommandPool) {
         long chatId = update.getMessage().getChatId();
         SendMessage message = new SendMessage();
         if (userService.getUser(chatId).isEmpty()) {
             message.setChatId(chatId);
             message.setText("You are not registered");
-            return message;
+            return Response.getResponse(message);
         }
         userService.removeUser(chatId);
         message.setChatId(update.getMessage().getChatId());
         message.setText("You have been removed from the bot's database. If you want to use the bot again," +
                 " just enter the /start command\n");
-        return message;
+        return Response.getResponse(message);
     }
 }

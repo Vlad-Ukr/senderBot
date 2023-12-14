@@ -7,6 +7,7 @@ import jakarta.ws.rs.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -48,5 +49,10 @@ public class UserServiceImpl implements UserService {
         user.removeContact(contact);
         userRepository.removeContact(user.getId(), contactId);
         return contact.getName();
+    }
+
+    @Override
+    public List<User> getAllUserContacts(long userId) {
+        return userRepository.findUsersContactsByUserId(userId);
     }
 }

@@ -1,9 +1,11 @@
 package com.example.bot.command;
 
+import com.example.bot.bot.Response;
 import com.example.bot.command.impl.AddContactCommand;
 import com.example.bot.command.impl.GetOwnIdCommand;
 import com.example.bot.command.impl.RemoveContactCommand;
 import com.example.bot.command.impl.RemoveUserCommand;
+import com.example.bot.command.impl.SendMessagesCommand;
 import com.example.bot.command.impl.StartCommand;
 import com.example.bot.service.UserService;
 import org.springframework.stereotype.Component;
@@ -29,9 +31,10 @@ public class CommandInvoker {
         commandHashMap.put(CommandKey.REMOVE_USER.getKey(), new RemoveUserCommand(this.userService));
         commandHashMap.put(CommandKey.ADD_CONTACT.getKey(), new AddContactCommand(this.userService));
         commandHashMap.put(CommandKey.REMOVE_CONTACT.getKey(), new RemoveContactCommand(this.userService));
+        commandHashMap.put(CommandKey.SEND_MESSAGE.getKey(), new SendMessagesCommand(this.userService));
     }
 
-    public SendMessage invoke(String commandKey, Update update, WaitingCommandPool waitingCommandPool)
+    public Response invoke(String commandKey, Update update, WaitingCommandPool waitingCommandPool)
             throws IllegalArgumentException {
         if (commandHashMap.containsKey(commandKey)) {
             return commandHashMap.get(commandKey).executeCommand(update, waitingCommandPool);

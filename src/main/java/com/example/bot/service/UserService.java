@@ -3,6 +3,7 @@ package com.example.bot.service;
 import com.example.bot.entity.User;
 import jakarta.ws.rs.NotFoundException;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -30,4 +31,6 @@ public interface UserService {
      * @return name of added contact
      */
     String removeContact(User user, long contactId) throws NotFoundException;
+
+    List<User> getAllUserContacts(long userId);
 }

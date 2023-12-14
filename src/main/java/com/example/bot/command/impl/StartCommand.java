@@ -1,5 +1,6 @@
 package com.example.bot.command.impl;
 
+import com.example.bot.bot.Response;
 import com.example.bot.command.Command;
 import com.example.bot.command.CommandKey;
 import com.example.bot.command.WaitingCommandPool;
@@ -16,13 +17,13 @@ public class StartCommand implements Command {
     }
 
     @Override
-    public SendMessage executeCommand(Update update, WaitingCommandPool waitingCommandPool) {
+    public Response executeCommand(Update update, WaitingCommandPool waitingCommandPool) {
         long chatId = update.getMessage().getChatId();
         SendMessage message = new SendMessage();
         if (userService.getUser(chatId).isPresent()) {
             message.setChatId(chatId);
             message.setText("You are already registered");
-            return message;
+            return Response.getResponse(message);
         }
         if (!waitingCommandPool.isCommandsOnWaiting(chatId)) {
             message.setChatId(chatId);
@@ -35,6 +36,6 @@ public class StartCommand implements Command {
             message.setChatId(chatId);
             message.setText("You have been successfully logged in");
         }
-        return message;
+        return Response.getResponse(message);
     }
 }

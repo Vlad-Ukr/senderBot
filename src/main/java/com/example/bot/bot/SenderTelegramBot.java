@@ -6,7 +6,13 @@ import com.example.bot.config.BotConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
+import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -26,16 +32,33 @@ public class SenderTelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String messageText = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
+            String messageText = update.getMessage().getText();
             try {
                 if (waitingCommandPool.isCommandsOnWaiting(chatId)) {
-                    execute(commandInvoker.invoke(waitingCommandPool.getCommand(chatId), update, waitingCommandPool));
+                    executeResponse(
+                            commandInvoker.invoke(waitingCommandPool.getCommand(chatId), update, waitingCommandPool));
                 } else {
-                    execute(commandInvoker.invoke(messageText, update, waitingCommandPool));
+                    executeResponse(commandInvoker.invoke(messageText, update, waitingCommandPool));
                 }
             } catch (Exception exception) {
                 log.error(exception.getMessage());
+            }
+        } else if (update.hasCallbackQuery()) {
+            long chatId = update.getCallbackQuery().getMessage().getChatId();
+            try {
+                executeResponse(
+                        commandInvoker.invoke(waitingCommandPool.getCommand(chatId), update, waitingCommandPool));
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (update.hasMessage() && update.getMessage().hasPhoto()) {
+            long chatId = update.getMessage().getChatId();
+            try {
+                executeResponse(
+                        commandInvoker.invoke(waitingCommandPool.getCommand(chatId), update, waitingCommandPool));
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
             }
         }
     }
@@ -50,4 +73,30 @@ public class SenderTelegramBot extends TelegramLongPollingBot {
         return config.getToken();
     }
 
+    private void executeResponse(Response response) throws TelegramApiException {
+        if (response.isResponseEmpty()) {
+            return;
+        }
+        if (Objects.nonNull(response.getMessage())) {
+            execute(response.getMessage());
+        } else if (Objects.nonNull(response.getMessageList())) {
+            List<SendMessage> messageList = response.getMessageList();
+            messageList.stream().forEach(message -> {
+                try {
+                    execute(message);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } else if (Objects.nonNull(response.getSendPhotoList())) {
+            List<SendPhoto> photoList = response.getSendPhotoList();
+            photoList.stream().forEach(photo -> {
+                try {
+                    execute(photo);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+    }
 }
